@@ -11,7 +11,7 @@ class Products(models.Model):
     author = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
     price = models.IntegerField()
-    picture = models.ImageField(upload_to='media/')
+    picture = models.ImageField(upload_to='productimg')
 
 
     

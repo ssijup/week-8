@@ -141,7 +141,7 @@ STATIC_ROOT = os.path.join(BASE_DIR,'assets')
 
 MEDIA_ROOT = BASE_DIR
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/productimg/'
 
 AUTHENTICATION_BACKENDS = [
 
@@ -170,4 +170,4 @@ SOCIALACCOUNT_PROVIDERS = {
   
 SOCIALACCOUNT_QUERY_EMAIL  = True
 
-LOGIN_REDIRECT_URL = 'user_signup'
+LOGIN_REDIRECT_URL = 'index_3_home'

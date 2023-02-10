@@ -47,19 +47,21 @@
                                         {% csrf_token %} 
 
                                         <div class="form-group">
-                                            <input type="email" class="form-control form-control-user"
-                                                id="exampleInputEmail" aria-describedby="emailHelp"
+                                            <input type="text" class="form-control form-control-user"
+                                                id="exampleInputEmail" aria-describedby=""
 
-                                                placeholder="Enter Email Address..." name="admin_email">
+                                                placeholder="Enter name..." name="name">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                id="exampleInputPassword" placeholder="Password" name="admin_password">
+                                                id="exampleInputPassword" placeholder="Password" name="password">
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
                                                 <input type="checkbox" class="custom-control-input" id="customCheck">
-                                                
+                                                <div>
+                                                    <h6>{{ error }}</h6>
+                                                </div>
                                             </div>
                                         </div><button type='submit'>
                                         <a  class="btn btn-primary btn-user btn-block">

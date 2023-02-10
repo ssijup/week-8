@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import Userdetails,Products
 from django.contrib.auth import authenticate,login,logout
 from django.core.files.storage import FileSystemStorage
+from django.views.decorators.cache import cache_control
 
 
 # Create your views here.
@@ -10,6 +11,7 @@ from django.core.files.storage import FileSystemStorage
 
 
 #********USER REGIDTRATION***************************************
+@cache_control(no_cache=True)
 def user_signup(request):
     if request.method == 'POST':
         uname = request.POST.get('user_name')
@@ -27,68 +29,121 @@ def user_signup(request):
         return render(request,'user_signup.html')
 
 
+
 #*****USER LOGIN**********************************************************
+@cache_control(no_cache=True)
 def user_signin(request):
     if request.method == "POST":
         uemail=request.POST['user_email']
         upassword=request.POST['user_password']
         user=Userdetails.objects.filter(user_email=uemail,user_password=upassword)
         if user is not None:
-            return render(request,'shop-list-left-books.html')
+            return render(request,'index_3_home.html')
         else:
             return HttpResponse('PASSWORD INCORRECT')
     else:
         print('sigin')
-        return render(request,'admin_productslist.html')
+        return render(request,'user_signin.html')
 
+
+@cache_control(no_cache=True)
 def admin_login(request):
-    if request.method == 'POST':
-        aemail = request.POST.get('admin_email')
-        apassword = request.POST.get('admin_password')
-        user = authenticate(request,password = apassword,email = aemail)
-        if user is  None:
+    error_msg = None
+    if request.method == 'GET':
+        if request.user.is_authenticated:
             return redirect('admin_userlist')
-        else:
-            return HttpResponse('invalid pass or uname')
-    return render(request,'admin_login.html')
-
-
-def admin_userlist(request):
-    userlist = Userdetails.objects.all()
-    return render(request,'admin_userlist.html',{'tablelist' : userlist})
-
-
-def admin_products(request):
-    return render(request,'admin_productslist.html')
-
-
-def admin_addproducts(request):
-    if request.method == 'POST' :
-        # myfile =request.FILES.get('myfile')
-        # fs = FileSystemStorage()
-        # filename = fs.save(myfile.book_title,myfile)
-        # url = fs.url(filename)
-
-        # book_title = request.POST.get('book_title')
-        # author = request.POST.get('author')
-        # description = request.POST.get('description')
-        # image = request.FILES.get('myfile')
-        # price = request.POST.get('price')
-        new_product = Products(
-            book_title = request.POST.get('book_title'),
-            author = request.POST.get('author'),
-            picture = request.FILES.get('myfile'),
-            description = request.POST.get('description'),
-            price = request.POST.get('price')
-        )
-        new_product.save()
-        return redirect('admin_productslist')
+        return render(request, 'admin_login.html')
+    elif request.user.is_authenticated:
+        return redirect('admin_userlist')
     else:
-        return render(request,'admin_addproducts.html')
+        if request.method == 'POST':
+            name = request.POST.get('name')
+            password = request.POST.get('password')
+
+            user = authenticate(request,username =name, password=password)
+
+            if user is not None:
+                login(request, user)
+                return redirect('admin_userlist')
+            else:
+                error_msg = 'invalid Name or password..!'
+
+    return render(request, 'admin_login.html', {'error': error_msg})
+        
 
 
+
+@cache_control(no_cache=True)
+def admin_logout(request):
+        logout(request)
+        return redirect('admin_login')
+
+
+
+@cache_control(no_cache=True)
+def admin_userlist(request):
+    if request.user.is_authenticated:
+        userlist = Userdetails.objects.all()
+        return render(request,'admin_userlist.html',{'tablelist' : userlist})
+
+
+
+@cache_control(no_cache=True)
+def admin_products(request):
+    if 'email' in request.session:
+        if 'email' in request.session:
+            return render(request,'admin_productslist.html')
+
+
+
+@cache_control(no_cache=True)
+def admin_addproducts(request):
+    if 'email' in request.session:
+        if request.method == 'POST' :
+            # myfile =request.FILES.get('myfile')
+            # fs = FileSystemStorage()
+            # filename = fs.save(myfile.book_title,myfile)
+            # url = fs.url(filename)
+
+            # book_title = request.POST.get('book_title')
+            # author = request.POST.get('author')
+            # description = request.POST.get('description')
+            # image = request.FILES.get('myfile')
+            # price = request.POST.get('price')
+            new_product = Products(
+                book_title = request.POST.get('book_title'),
+                author = request.POST.get('author'),
+                picture = request.FILES.get('myfile'),
+                description = request.POST.get('description'),
+                price = request.POST.get('price')
+            )
+            new_product.save()
+            return redirect('admin_productslist')
+        else:
+            return render(request,'admin_addproducts.html')
+
+
+
+@cache_control(no_cache=True)
 def admin_productslist(request):
-    print('hii nprinttttttt')
+    if 'email' in request.session:
+        list =Products.objects.all()
+        return render(request,'admin_productslist.html',{'list' : list})
+
+@cache_control(no_cache=True)
+def shop_list_left_books(request):
     list =Products.objects.all()
-    return render(request,'admin_productslist.html',{'list' : list})
-    
+    return render(request,'shop-list-left-books.html',{'list' : list})
+
+
+
+@cache_control(no_cache=True)
+def product_detail(request):
+    list =Products.objects.all()
+    return render(request,'product_details.html',{'list' : list})
+
+
+
+@cache_control(no_cache=True)
+def index_3_home(request):
+    return render(request,"index_3_home.html")
